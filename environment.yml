@@ -1,0 +1,32 @@
+# usage (*):
+#  1) cd to directory with this file
+#  2) $ conda env create
+#     -or-
+#     $ conda env update
+#  3) source activate XYZ
+#
+#     where name: XYZ appears below
+#  4) source deactivate
+#
+#  * conda installation required - https://conda.io/docs/install/full.html
+#
+name: lana
+dependencies:
+- python=3.6.1
+
+- boto3
+- pyyaml
+- sqlalchemy
+- tornado
+- requests
+
+# enable pip support
+- pip
+
+# list of pip packages
+- pip:
+  - mysqlclient
+  - pyjwt
+  - bcrypt
+  - pytest
+  - python-dotenv
