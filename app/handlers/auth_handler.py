@@ -28,7 +28,8 @@ class AuthHandler(BaseHandler):
       pass
     elif item == 'login':
       # do /login
-      email = data["user_email"]
+      # TODO: email is actually username right now.  TBD on how this will be handled in the future.
+      email = data["username"]
       password = data["password"]
       auth = Auth(email, password)
       if auth.login():
