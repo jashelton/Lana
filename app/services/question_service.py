@@ -32,7 +32,7 @@ class QuestionService(BaseService):
     # +----------------------------------------------------------+
     # | id | created_at | question_id | question_type | question |
     # +----------------------------------------------------------+
-    sql = text(' \
+    sql_questions = text(' \
       select \
         P.id, \
         created_at, \
@@ -44,13 +44,30 @@ class QuestionService(BaseService):
       where P.id = :id; \
     ')
 
-    question = self._db_session.execute(sql, dict(id=id))
-    question_dict = [dict(zip(row.keys(), row)) for row in question]
+    sql_answers = text(' \
+      select \
+        id, \
+        question_id, \
+        value, \
+        answer \
+      from answers \
+      where poll_id = :id \
+    ')
 
-    return dict(
+    questions = self._db_session.execute(sql_questions, dict(id=id)).fetchall()
+    answers = self._db_session.execute(sql_answers, dict(id=id)).fetchall()
+    question_dict = [dict(zip(row.keys(), row)) for row in questions]
+    answers_dict = [dict(zip(row.keys(), row)) for row in answers]
+
+    poll = dict(
       poll_id=question_dict[0]['id'],
       created_at=question_dict[0]['created_at'],
       primary_question=next((item for item in question_dict if item['question_type'] == "primary"), None),
       secondary_questions=[x for x in question_dict if x['question_type'] == "secondary"]
     )
-    # return [dict(zip(row.keys(), row)) for row in question]
+
+    poll['primary_question']['answers']=[a for a in answers_dict if a['question_id'] == poll['primary_question']['question_id']]
+    for sq in poll['secondary_questions']:
+      sq['answers'] = [a for a in answers_dict if a['question_id'] == sq['question_id']]
+
+    return dict(poll)
