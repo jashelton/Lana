@@ -1,5 +1,6 @@
 .env
 config/db.yml
+seed/*
 log/*
 .DS_Store
 __pycache__
