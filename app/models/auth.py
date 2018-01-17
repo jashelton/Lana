@@ -1,6 +1,6 @@
 from tornado.options import options
 from app.services.db import DB
-from sqlalchemy import select
+from sqlalchemy import select, text
 from datetime import datetime, timedelta
 import re
 import os
@@ -38,11 +38,3 @@ class Auth(object):
                                         .where(user_table.c.id == self.user)).fetchone()[0]
     return bcrypt.checkpw(self.password.encode(encoding='UTF-8', errors='strict'),
                           hashed_pw.encode(encoding='UTF-8', errors='strict'))
-
-  # def record_login(self, *, ip=None):
-  #   L = self._db.tables['logins']
-  #   login = {'ip': ip, 'user_id': self.user, 'created_at': datetime.now(), 'updated_at': datetime.now()}
-  #   res = self.db_session.execute(L.insert().values(login))
-  #   self.db_session.commit()
-  #   return res.inserted_primary_key[0]
-

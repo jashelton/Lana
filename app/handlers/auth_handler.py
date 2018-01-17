@@ -1,7 +1,7 @@
 from app.handlers.base_handler import BaseHandler
 from app.models.auth import Auth
 from app.helpers.auth_helper import decode_jwt
-# from app.services.user_service import UserService
+from app.services.auth_service import AuthService
 import jwt
 from app.models.errors import HTTPError
 import os
@@ -11,7 +11,7 @@ SECRET = os.environ.get('HMAC_SECRET', None)
 
 
 class AuthHandler(BaseHandler):
-  ITEMS = ('login', 'logout')
+  ITEMS = ('login', 'logout', 'register')
 
   def get(self, item=None):
     self.write('<html><body><form action="/login" method="post">'
@@ -50,6 +50,15 @@ class AuthHandler(BaseHandler):
       self.clear_cookie("token")
       self.set_status(200)
       response = {'message': 'Successfully logged out user'}
+    elif item == "register":
+      print('-- HELLO FROM REGISTER HANDLER --')
+      form_data = data['data']
+      user_info = dict(name=form_data['name'], username=form_data['username'], password=form_data['password'])
+      res = AuthService().register(user_info)
+      print('---- response ----')
+      response = { 'data': res }
+      print('---- end response ----')
+      print(response)
     else:
       assert item not in self.ITEMS, 'Not implemented: item={}'.format(item)
       raise HTTPError(404)

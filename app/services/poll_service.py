@@ -6,6 +6,7 @@ from app.models.errors import InvalidParametersError, ResourceNotFoundError, HTT
   UserNotFoundError, UnauthorizedRequest, ArgumentError
 
 class PollService(BaseService):
+  # TODO: A lot of stuff in question service/handler should be moved to poll service/handler
   def __init__(self):
     self._db_session = self.new_session()
 
