@@ -3,21 +3,16 @@ from app.services.question_service import QuestionService
 from app.models.errors import HTTPError
 
 class QuestionHandler(BaseHandler):
-  ITEMS = ('questions')
   def get(self, the_id=None, **kwargs):
-    print(the_id)
-    print(**kwargs)
+    current_user = self.get_arguments("user_id")
     if the_id:
-      print('--found id--')
-      print(the_id)
       # questions/:id
-      res = QuestionService().one(the_id)
+      # TODO: CHECK IF USER HAS ALREADY TAKEN POLL
+      res = QuestionService().one(the_id, int(current_user[0]))
       response = {'data': res}
-      print(response)
       self.finish(response)
     else:
       # /questions
       res = QuestionService().all()
       response = { 'data': res }
-      print(response)
       self.finish(response)

@@ -28,7 +28,18 @@ class QuestionService(BaseService):
     all_questions = self._db_session.execute(sql).fetchall()
     return [dict(zip(row.keys(), row)) for row in all_questions]
 
-  def one(self, id):
+  def one(self, id, user_id):
+
+    sql_has_taken_poll = text(' \
+      select exists( \
+	      select * from poll_events \
+        where action = "completed" and user_id = :user_id and poll_id = :poll_id) as has_taken_poll; \
+    ')
+
+    is_taken = self._db_session.execute(sql_has_taken_poll, dict(user_id=user_id, poll_id=id)).fetchone()
+    if is_taken['has_taken_poll']:
+      return dict(has_taken=True)
+
     # +----------------------------------------------------------+
     # | id | created_at | question_id | question_type | question |
     # +----------------------------------------------------------+

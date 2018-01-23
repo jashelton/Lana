@@ -4,15 +4,11 @@ from app.services.poll_service import PollService
 
 class PollsHandler(BaseHandler):
   ITEMS = ('polls')
-  def get(self, user=None, **kwargs):
-    print(user)
+  def get(self, item=None, user=None, **kwargs):
     if user:
-      print('--user--')
-      print(user)
       # polls/:user
       res = PollService().get_poll_by_user(user)
       response = {'data': res}
-      print(response)
       self.finish(response)
     else:
       self.finish({'error': 'blah'})
@@ -21,3 +17,7 @@ class PollsHandler(BaseHandler):
       # response = { 'data': res }
       # print(response)
       # self.finish(response)
+
+  def post(self, data=None, **kwargs):
+    if data:
+      print(data)

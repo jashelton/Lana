@@ -42,7 +42,7 @@ class AuthHandler(BaseHandler):
         self.set_cookie("token", str(encoded)[2:-1])
         # auth.record_login(ip=self.request.remote_ip)
         # [2:-1] is removing b'' from token
-        response = {'token': str(encoded)[2:-1], 'current_user': auth.email}
+        response = {'token': str(encoded)[2:-1], 'current_user': {'username': auth.email, 'id': auth.user}}
       else:
         raise HTTPError(reason="Login failed")
     elif item == "logout":
