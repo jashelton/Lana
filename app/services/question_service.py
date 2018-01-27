@@ -16,13 +16,19 @@ class QuestionService(BaseService):
     sql = text(' \
       select \
         P.id, \
-        created_at, \
+        P.creator_id, \
+        U.username as created_by, \
+        P.created_at, \
         Q.id as question_id, \
         Q.type as question_type, \
-        Q.question \
+        Q.question, \
+        count(PE.id) as responses \
       from polls P \
       join questions Q on Q.poll_id = P.id \
-      where Q.type = "primary"; \
+      join users U on U.id = P.creator_id \
+      join poll_events PE on PE.poll_id = P.id \
+      where Q.type = "primary" and PE.action = "completed" \
+      group by P.id, P.creator_id, U.username, P.created_at, Q.id, Q.type, Q.question; \
     ')
 
     all_questions = self._db_session.execute(sql).fetchall()
