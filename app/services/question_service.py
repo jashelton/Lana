@@ -26,12 +26,14 @@ class QuestionService(BaseService):
       from polls P \
       join questions Q on Q.poll_id = P.id \
       join users U on U.id = P.creator_id \
-      join poll_events PE on PE.poll_id = P.id \
-      where Q.type = "primary" and PE.action = "completed" \
+      left join poll_events PE on PE.poll_id = P.id and PE.action = "completed" \
+      where Q.type = "primary" \
       group by P.id, P.creator_id, U.username, P.created_at, Q.id, Q.type, Q.question; \
     ')
 
     all_questions = self._db_session.execute(sql).fetchall()
+    test = [dict(zip(row.keys(), row)) for row in all_questions]
+    print(test)
     return [dict(zip(row.keys(), row)) for row in all_questions]
 
   def one(self, id, user_id):
