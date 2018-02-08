@@ -11,11 +11,7 @@ class ResponseService(BaseService):
     self._db_session = self.new_session()
 
   def create_response(self, response):
-
-    print('--- response ---')
-    print(response)
     current_poll = response['poll_id']
-    print(response)
 
     insert_poll_event = text(' \
       insert into poll_events(poll_id, user_id, action, timestamp) values(:poll_id, :user_id, "completed", curdate()) \

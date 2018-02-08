@@ -33,7 +33,6 @@ class QuestionService(BaseService):
 
     all_questions = self._db_session.execute(sql).fetchall()
     test = [dict(zip(row.keys(), row)) for row in all_questions]
-    print(test)
     return [dict(zip(row.keys(), row)) for row in all_questions]
 
   def one(self, id, user_id):

@@ -25,7 +25,8 @@ URL_HANDLERS = {
     ),
 
     ResultsHandler: (
-      r"/results/(?P<the_id>\d+)",),
+      r"/results/(?P<the_id>\d+)",
+      r"/test"),
 
     AppHandler: (
       r"/",)

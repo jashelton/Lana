@@ -12,12 +12,7 @@ class PollsHandler(BaseHandler):
       self.finish(response)
     else:
       self.finish({'error': 'blah'})
-      # /questions
-      # res = QuestionService().all()
-      # response = { 'data': res }
-      # print(response)
-      # self.finish(response)
 
   def post(self, data=None, **kwargs):
     if data:
-      print(data)
+      return
