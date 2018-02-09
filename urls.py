@@ -3,6 +3,7 @@ from app.handlers.question_handler import QuestionHandler
 from app.handlers.polls_handler import PollsHandler
 from app.handlers.response_handler import ResponseHandler
 from app.handlers.results_handler import ResultsHandler
+from app.handlers.favorites_handler import FavoritesHandler
 from app.handlers.app_handler import AppHandler
 
 URL_HANDLERS = {
@@ -27,6 +28,9 @@ URL_HANDLERS = {
     ResultsHandler: (
       r"/results/(?P<the_id>\d+)",
       r"/test"),
+
+    FavoritesHandler: (
+      r"/favorites",),
 
     AppHandler: (
       r"/",)

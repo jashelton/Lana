@@ -22,7 +22,8 @@ class QuestionService(BaseService):
         Q.id as question_id, \
         Q.type as question_type, \
         Q.question, \
-        count(PE.id) as responses \
+        count(PE.id) as responses, \
+        exists (select 1 from favorites F where F.poll_id = P.id and F.user_id = 1) as favorite \
       from polls P \
       join questions Q on Q.poll_id = P.id \
       join users U on U.id = P.creator_id \
@@ -32,7 +33,6 @@ class QuestionService(BaseService):
     ')
 
     all_questions = self._db_session.execute(sql).fetchall()
-    test = [dict(zip(row.keys(), row)) for row in all_questions]
     return [dict(zip(row.keys(), row)) for row in all_questions]
 
   def one(self, id, user_id):
