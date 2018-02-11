@@ -51,10 +51,6 @@ class ResultsService(BaseService):
   def update_poll_filters(self, data):
     # TODO:
     # If multiple questions have the same text value, it will remove those responses.
-    sql_user_ids = text(' \
-      select user_id from responses where poll_id = :poll_id and value in :values \
-    ')
-
     sql_user_ids = self._db_session.execute(
       text(' \
         select user_id from responses where poll_id = :poll_id and value in :values \
@@ -70,7 +66,7 @@ class ResultsService(BaseService):
     sql_response_count = text(' \
       select count(*) as count \
       from poll_events \
-      where poll_id = :poll_id and action = "completed" and user_id not in :filtered_users_list; \
+      where poll_id = :poll_id and action = "completed" and user_id in :filtered_users_list; \
     ')
 
     # +----------------------+
@@ -85,7 +81,7 @@ class ResultsService(BaseService):
     # +--------------------------------------------+
     sql_filtered_results = text(' \
       select A.id, A.question_id, A.answer, count(R.id) as response_count from answers A \
-      left join responses R on R.poll_id = A.poll_id and R.value = A.value and R.user_id not in :filtered_users_list \
+      left join responses R on R.poll_id = A.poll_id and R.value = A.value and R.user_id in :filtered_users_list \
       where A.poll_id = :poll_id \
       group by A.id, A.answer, A.question_id; \
     ')
