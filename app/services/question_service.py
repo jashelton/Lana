@@ -23,6 +23,7 @@ class QuestionService(BaseService):
         Q.type as question_type, \
         Q.question, \
         count(PE.id) as responses, \
+        (select count(Q1.id) from questions Q1 where Q1.poll_id = P.id) as question_count, \
         exists (select 1 from favorites F where F.poll_id = P.id and F.user_id = 1) as favorite \
       from polls P \
       join questions Q on Q.poll_id = P.id \
