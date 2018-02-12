@@ -21,16 +21,13 @@ class PollService(BaseService):
     username = self._db_session.execute(sql_username, dict(user=user)).fetchone()
 
     sql_polls_by_action = text(' \
-      select PE.poll_id as poll_id, PE.timestamp as created_at, Q.id as question_id, Q.question, U.username \
+      select PE.id, PE.poll_id as poll_id, PE.action, PE.timestamp as created_at, Q.id as question_id, Q.question, U.username \
       from poll_events PE \
       join questions Q on PE.poll_id = Q.poll_id \
       join users U on U.id = PE.user_id \
-      where PE.user_id = :user_id and PE.action = :action and Q.type = "primary"; \
+      where PE.user_id = :user_id and Q.type = "primary"; \
     ')
 
-    created_polls = self._db_session.execute(sql_polls_by_action, dict(user_id=username['id'], action="created")).fetchall()
-    taken_polls = self._db_session.execute(sql_polls_by_action, dict(user_id=username['id'], action="completed")).fetchall()
+    polls_activity = self._db_session.execute(sql_polls_by_action, dict(user_id=username['id'])).fetchall()
 
-    return dict(
-      created_polls=[dict(zip(row.keys(), row)) for row in created_polls],
-      taken_polls=[dict(zip(row.keys(), row)) for row in taken_polls])
+    return [dict(zip(row.keys(), row)) for row in polls_activity]
