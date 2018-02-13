@@ -17,8 +17,25 @@ class BookmarkService(BaseService):
     response_sql_polls = self._db_session.execute(sql_polls_list, dict(user_id=user))
     polls = [ p.poll_id for p in response_sql_polls ]
 
+    # sql_polls = text(' \
+    #   select * from questions where poll_id in :polls_list and type="primary"; \
+    # ')
+
     sql_polls = text(' \
-      select * from questions where poll_id in :polls_list and type="primary"; \
+      select \
+        Q.id, \
+        Q.poll_id, \
+        Q.question, \
+        P.created_at, \
+          U.username, \
+          count(R.id) as response_count, \
+          (select count(Q1.id) from questions Q1 where Q1.poll_id = P.id) as question_count \
+      from questions Q \
+      join polls P on P.id = Q.poll_id \
+      join users U on U.id = P.creator_id \
+      left join responses R on R.poll_id = P.id and R.question_id = Q.id \
+      where Q.poll_id in :polls_list and type="primary" \
+      group by Q.id, Q.poll_id, Q.question, P.created_at, U.username; \
     ')
 
     response_sql_polls = self._db_session.execute(sql_polls, dict(polls_list=polls)).fetchall()
