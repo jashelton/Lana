@@ -54,13 +54,14 @@ class QuestionService(BaseService):
     sql_questions = text(' \
       select \
         P.id, \
-        created_at, \
+        P.created_at, \
         Q.id as question_id, \
         Q.type as question_type, \
         Q.question \
       from polls P \
       join questions Q on Q.poll_id = P.id \
-      where P.id = :id; \
+      where P.id = :id \
+      order by Q.type; \
     ')
 
     sql_answers = text(' \
@@ -81,12 +82,17 @@ class QuestionService(BaseService):
     poll = dict(
       poll_id=question_dict[0]['id'],
       created_at=question_dict[0]['created_at'],
-      primary_question=next((item for item in question_dict if item['question_type'] == "primary"), None),
-      secondary_questions=[x for x in question_dict if x['question_type'] == "secondary"]
+      questions=[x for x in question_dict],
+      # primary_question=next((item for item in question_dict if item['question_type'] == "primary"), None),
+      # secondary_questions=[x for x in question_dict if x['question_type'] == "secondary"]
     )
 
-    poll['primary_question']['answers']=[a for a in answers_dict if a['question_id'] == poll['primary_question']['question_id']]
-    for sq in poll['secondary_questions']:
-      sq['answers'] = [a for a in answers_dict if a['question_id'] == sq['question_id']]
+    for q in poll['questions']:
+      q['answers'] = [a for a in answers_dict if a['question_id'] == q['question_id']]
+
+    # poll['primary_question']['answers']=[a for a in answers_dict if a['question_id'] == poll['primary_question']['question_id']]
+
+    # for sq in poll['secondary_questions']:
+    #   sq['answers'] = [a for a in answers_dict if a['question_id'] == sq['question_id']]
 
     return dict(poll)
