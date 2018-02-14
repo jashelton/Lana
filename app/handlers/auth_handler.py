@@ -1,6 +1,6 @@
 from app.handlers.base_handler import BaseHandler
 from app.models.auth import Auth
-from app.helpers.auth_helper import decode_jwt
+# from app.helpers.auth_helper import decode_jwt
 from app.services.auth_service import AuthService
 import jwt
 from app.models.errors import HTTPError

@@ -1,6 +1,8 @@
 from app.handlers.base_handler import BaseHandler
 from app.services.response_service import ResponseService
+from app.helpers.auth_helper import jwtauth
 
+@jwtauth
 class ResponseHandler(BaseHandler):
   ITEMS = ('response', 'create')
   def get(self, item=None, **kwargs):

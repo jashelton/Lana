@@ -1,7 +1,9 @@
 from app.handlers.base_handler import BaseHandler
 from app.services.results_service import ResultsService
+from app.helpers.auth_helper import jwtauth
 from app.models.errors import HTTPError
 
+@jwtauth
 class ResultsHandler(BaseHandler):
   def get(self, the_id=None, **kwargs):
     if the_id:

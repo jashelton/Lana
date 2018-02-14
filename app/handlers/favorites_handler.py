@@ -1,7 +1,9 @@
 from app.handlers.base_handler import BaseHandler
 from app.services.favorites_service import FavoritesService
+from app.helpers.auth_helper import jwtauth
 from app.models.errors import HTTPError
 
+@jwtauth
 class FavoritesHandler(BaseHandler):
   def post(self, **kwargs):
     # /favorites
