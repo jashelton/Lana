@@ -55,8 +55,8 @@ class ResponseService(BaseService):
       last_question_id = self._db_session.execute(sql_last_question_id).fetchone()[0]
       for a in q['answers']:
         sql_answer = text(' \
-          insert into answers(poll_id, question_id, value, answer) values(:poll_id, :question_id, :value, :name) \
+          insert into answers(poll_id, question_id, answer) values(:poll_id, :question_id, :answer) \
         ')
-        self._db_session.execute(sql_answer, dict(poll_id=last_poll_id, question_id=last_question_id, value=a['name'], name=a['name']))
+        self._db_session.execute(sql_answer, dict(poll_id=last_poll_id, question_id=last_question_id, answer=a['name']))
     self._db_session.commit()
     return last_poll_id

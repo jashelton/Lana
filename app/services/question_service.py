@@ -68,7 +68,6 @@ class QuestionService(BaseService):
       select \
         id, \
         question_id, \
-        value, \
         answer \
       from answers \
       where poll_id = :id \

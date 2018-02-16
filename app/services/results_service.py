@@ -29,7 +29,7 @@ class ResultsService(BaseService):
     # +--------------------------------------------+
     sql_answers_responses = text(' \
       select A.id, A.question_id, A.answer, count(R.id) as response_count from answers A \
-      left join responses R on R.poll_id = A.poll_id and R.value = A.value \
+      left join responses R on R.poll_id = A.poll_id and R.value = A.answer \
       where A.poll_id = :poll_id \
       group by A.id, A.answer, A.question_id; \
     ')
@@ -53,9 +53,13 @@ class ResultsService(BaseService):
     # If multiple questions have the same text value, it will remove those responses.
     sql_user_ids = self._db_session.execute(
       text(' \
-        select user_id from responses where poll_id = :poll_id and value in :values \
+        select user_id \
+        from responses \
+        where poll_id = :poll_id and value in :values \
+        group by user_id \
+        having count(distinct value) = :filter_length; \
       '),
-      dict(poll_id=data['poll_id'], values=[data['filters']])
+      dict(poll_id=data['poll_id'], values=data['filters'], filter_length=len(data['filters']))
     ).fetchall()
 
     user_ids = [x.user_id for x in sql_user_ids]
@@ -81,7 +85,7 @@ class ResultsService(BaseService):
     # +--------------------------------------------+
     sql_filtered_results = text(' \
       select A.id, A.question_id, A.answer, count(R.id) as response_count from answers A \
-      left join responses R on R.poll_id = A.poll_id and R.value = A.value and R.user_id in :filtered_users_list \
+      left join responses R on R.poll_id = A.poll_id and R.value = A.answer and R.user_id in :filtered_users_list \
       where A.poll_id = :poll_id \
       group by A.id, A.answer, A.question_id; \
     ')
