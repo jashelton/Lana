@@ -15,6 +15,6 @@ class QuestionHandler(BaseHandler):
       self.finish(response)
     else:
       # /questions
-      res = QuestionService().all()
+      res = QuestionService().all(int(current_user[0]))
       response = { 'data': res }
       self.finish(response)

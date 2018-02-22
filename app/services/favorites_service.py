@@ -11,7 +11,7 @@ class FavoritesService(BaseService):
 
   def add_favorite(self, user, poll):
     sql = (' \
-      insert into favorites(timestamp, user_id, poll_id) values(curdate(), :user_id, :poll_id); \
+      insert into favorites(poll_id, user_id, timestamp) values(:poll_id, :user_id, curdate()); \
     ')
 
     self._db_session.execute(sql, dict(user_id=user, poll_id=poll))
