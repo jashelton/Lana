@@ -13,11 +13,7 @@ class ResultsHandler(BaseHandler):
 
       self.finish(response)
     else:
-      data = dict(
-        poll_id = self.get_argument('poll_id', None),
-        user_id = self.get_argument('user_id', None),
-        filters = self.get_argument('filters', None).split(',')
-      )
+      data = self.get_argument('params', None)
 
       res = ResultsService().update_poll_filters(data)
       response = { 'data': res }
