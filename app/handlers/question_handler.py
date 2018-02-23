@@ -3,7 +3,7 @@ from app.services.question_service import QuestionService
 from app.helpers.auth_helper import jwtauth
 from app.models.errors import HTTPError
 
-@jwtauth
+# @jwtauth
 class QuestionHandler(BaseHandler):
   def get(self, the_id=None, **kwargs):
     current_user = self.get_arguments("user_id")

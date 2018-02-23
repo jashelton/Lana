@@ -24,7 +24,7 @@ class QuestionService(BaseService):
         Q.question, \
         count(PE.id) as responses, \
         (select count(Q1.id) from questions Q1 where Q1.poll_id = P.id) as question_count, \
-        exists (select 1 from favorites F where F.poll_id = P.id and F.user_id = 2) as favorite \
+        exists (select 1 from favorites F where F.poll_id = P.id and F.user_id = :user_id ) as favorite \
       from polls P \
       join questions Q on Q.poll_id = P.id \
       join users U on U.id = P.creator_id \
@@ -33,7 +33,7 @@ class QuestionService(BaseService):
       group by P.id, P.creator_id, U.username, P.created_at, Q.id, Q.type, Q.question; \
     ')
 
-    all_questions = self._db_session.execute(sql).fetchall()
+    all_questions = self._db_session.execute(sql, dict(user_id=user)).fetchall()
     return [dict(zip(row.keys(), row)) for row in all_questions]
 
   def one(self, id, user_id):
