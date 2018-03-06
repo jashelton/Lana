@@ -30,9 +30,10 @@ class CommentsService(BaseService):
     # | id | thread_id | parent_id | user_id | created_at | text | has_children |
     # +-------------------------------------------------------------------------+
     sql_comments = self._db_session.execute(' \
-      select *, \
+      select C1.*, U.username, \
       exists (select 1 from comments C2 where C2.thread_id = C1.thread_id and C2.parent_id = C1.id) as has_children \
       from comments C1 \
+      join users U on U.id = C1.user_id \
       where C1.thread_id = :thread_id; \
     ', dict(thread_id=thread_id)).fetchall()
     comments = [dict(zip(row.keys(), row)) for row in sql_comments]
