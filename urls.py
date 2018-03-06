@@ -5,6 +5,7 @@ from app.handlers.response_handler import ResponseHandler
 from app.handlers.results_handler import ResultsHandler
 from app.handlers.favorites_handler import FavoritesHandler
 from app.handlers.bookmark_handler import BookmarkHandler
+from app.handlers.comments_handler import CommentsHandler
 from app.handlers.app_handler import AppHandler
 
 URL_HANDLERS = {
@@ -35,6 +36,9 @@ URL_HANDLERS = {
 
     BookmarkHandler: (
       r"/bookmarks/(?P<user_id>\d+)",),
+
+    CommentsHandler: (
+      r"/(?P<item>{})/(?P<the_id>\d+)".format('|'.join(CommentsHandler.ITEMS)),),
 
     AppHandler: (
       r"/",)
