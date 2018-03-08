@@ -51,8 +51,32 @@ class CommentsService(BaseService):
         comment['comments'] = self.get_children(comment, comments)
     return child_comments
 
+  def add_thread(self, data):
+    sql_create_thread = text(' \
+      insert into threads(poll_id, text, created_at, user_id) values(:poll_id, :text, curdate(), :user_id); \
+    ')
+
+    self._db_session.execute(sql_create_thread, dict(
+      poll_id=data['poll_id'],
+      text=data['text'],
+      user_id=data['user_id']))
+
+    last_thread_id = self._db_session.execute('SELECT LAST_INSERT_ID();').fetchone()[0]
+
+    thread_response = self._db_session.execute(' \
+      select T.id, T.text, T.created_at, U.username, count(C.id) as num_comments from threads T \
+      left join comments C on C.thread_id = T.id \
+      join users U on U.id = T.user_id \
+      where T.id = :thread_id \
+      group by T.id, T.text, T.created_at, U.username; \
+    ', dict(thread_id=last_thread_id)).fetchall()
+
+    thread = [dict(zip(row.keys(), row)) for row in thread_response]
+
+    self._db_session.commit()
+    return dict(message='You have successfully created a thread.', thread=thread[0])
+
   def add_comment(self, data):
-    print(data)
     sql_create_comment = text(' \
       insert into comments(thread_id, parent_id, user_id, created_at, text) values(:thread_id, :parent_id, :user_id, curdate(), :text); \
     ')
@@ -62,7 +86,6 @@ class CommentsService(BaseService):
       parent_id=data['parent_id'],
       user_id=data['user_id'],
       text=data['text']))
-    self._db_session.commit()
 
     last_comment_id = self._db_session.execute('SELECT LAST_INSERT_ID();').fetchone()[0]
 
@@ -74,6 +97,6 @@ class CommentsService(BaseService):
     ', dict(comment_id=last_comment_id)).fetchall()
 
     comment = [dict(zip(row.keys(), row)) for row in comment_response]
-    print(comment)
 
+    self._db_session.commit()
     return dict(message='You have successfully added a comment.', comment=comment)

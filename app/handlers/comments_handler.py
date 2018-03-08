@@ -9,7 +9,6 @@ from app.models.errors import HTTPError
 class CommentsHandler(BaseHandler):
   ITEMS = ('comments', 'threads')
   def get(self, item=None, the_id=None, **kwargs):
-    print(item)
     if item == 'threads' and the_id:
       # threads/:poll_id
       res = CommentsService().get_threads_by_poll(the_id)
@@ -21,9 +20,15 @@ class CommentsHandler(BaseHandler):
       response = {'data': res}
       self.finish(response)
 
-  def post(self, **kwargs):
+  def post(self, item=None, **kwargs):
     self.load_json()
     data = self.request.arguments
-    res = CommentsService().add_comment(data['commentData'])
-    response = {'data': res}
-    self.finish(response)
+
+    if item == 'comments':
+      res = CommentsService().add_comment(data['commentData'])
+      response = {'data': res}
+      self.finish(response)
+    elif item == 'threads':
+      res = CommentsService().add_thread(data['threadData'])
+      response = {'data': res}
+      self.finish(response)
