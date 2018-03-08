@@ -38,6 +38,7 @@ URL_HANDLERS = {
       r"/bookmarks/(?P<user_id>\d+)",),
 
     CommentsHandler: (
+      r"/comments",
       r"/(?P<item>{})/(?P<the_id>\d+)".format('|'.join(CommentsHandler.ITEMS)),),
 
     AppHandler: (

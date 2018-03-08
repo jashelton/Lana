@@ -50,3 +50,30 @@ class CommentsService(BaseService):
       if comment['has_children']:
         comment['comments'] = self.get_children(comment, comments)
     return child_comments
+
+  def add_comment(self, data):
+    print(data)
+    sql_create_comment = text(' \
+      insert into comments(thread_id, parent_id, user_id, created_at, text) values(:thread_id, :parent_id, :user_id, curdate(), :text); \
+    ')
+
+    self._db_session.execute(sql_create_comment, dict(
+      thread_id=data['thread_id'],
+      parent_id=data['parent_id'],
+      user_id=data['user_id'],
+      text=data['text']))
+    self._db_session.commit()
+
+    last_comment_id = self._db_session.execute('SELECT LAST_INSERT_ID();').fetchone()[0]
+
+    comment_response = self._db_session.execute(' \
+      select C.*, U.username \
+      from comments C \
+      join users U on U.id = C.user_id \
+      where C.id = :comment_id; \
+    ', dict(comment_id=last_comment_id)).fetchall()
+
+    comment = [dict(zip(row.keys(), row)) for row in comment_response]
+    print(comment)
+
+    return dict(message='You have successfully added a comment.', comment=comment)

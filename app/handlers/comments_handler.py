@@ -21,6 +21,9 @@ class CommentsHandler(BaseHandler):
       response = {'data': res}
       self.finish(response)
 
-  def post(self, data=None, **kwargs):
-    if data:
-      return
+  def post(self, **kwargs):
+    self.load_json()
+    data = self.request.arguments
+    res = CommentsService().add_comment(data['commentData'])
+    response = {'data': res}
+    self.finish(response)
