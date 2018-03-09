@@ -11,15 +11,15 @@ class CommentsService(BaseService):
 
   # Return a list of threads for a poll
   def get_threads_by_poll(self, poll_id):
-    # +--------------------------------------------------+
-    # | id | text | created_at | username | num_comments |
-    # +--------------------------------------------------+
+    # +-----------------------------------------------------------------+
+    # | id | title | description | created_at | username | num_comments |
+    # +-----------------------------------------------------------------+
     sql_threads = self._db_session.execute(' \
-      select T.id, T.text, T.created_at, U.username, count(C.id) as num_comments from threads T \
+      select T.id, T.title, T.description, T.created_at, U.username, count(C.id) as num_comments from threads T \
       left join comments C on C.thread_id = T.id \
       join users U on U.id = T.user_id \
       where T.poll_id = :poll_id \
-      group by T.id, T.text, T.created_at, U.username; \
+      group by T.id, T.title, T.description, T.created_at, U.username; \
     ', dict(poll_id=poll_id)).fetchall()
 
     return [dict(zip(row.keys(), row)) for row in sql_threads]
@@ -53,22 +53,23 @@ class CommentsService(BaseService):
 
   def add_thread(self, data):
     sql_create_thread = text(' \
-      insert into threads(poll_id, text, created_at, user_id) values(:poll_id, :text, curdate(), :user_id); \
+      insert into threads(poll_id, title, description, created_at, user_id) values(:poll_id, :title, :desc, curdate(), :user_id); \
     ')
 
     self._db_session.execute(sql_create_thread, dict(
       poll_id=data['poll_id'],
-      text=data['text'],
+      title=data['title'],
+      desc=data['desc'],
       user_id=data['user_id']))
 
     last_thread_id = self._db_session.execute('SELECT LAST_INSERT_ID();').fetchone()[0]
 
     thread_response = self._db_session.execute(' \
-      select T.id, T.text, T.created_at, U.username, count(C.id) as num_comments from threads T \
+      select T.id, T.title, T.description, T.created_at, U.username, count(C.id) as num_comments from threads T \
       left join comments C on C.thread_id = T.id \
       join users U on U.id = T.user_id \
       where T.id = :thread_id \
-      group by T.id, T.text, T.created_at, U.username; \
+      group by T.id, T.title, T.description, T.created_at, U.username; \
     ', dict(thread_id=last_thread_id)).fetchall()
 
     thread = [dict(zip(row.keys(), row)) for row in thread_response]
