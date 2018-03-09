@@ -84,7 +84,7 @@ class CommentsService(BaseService):
 
     self._db_session.execute(sql_create_comment, dict(
       thread_id=data['thread_id'],
-      parent_id=data['parent_id'],
+      parent_id=data.get('parent_id', None),
       user_id=data['user_id'],
       text=data['text']))
 
@@ -98,6 +98,7 @@ class CommentsService(BaseService):
     ', dict(comment_id=last_comment_id)).fetchall()
 
     comment = [dict(zip(row.keys(), row)) for row in comment_response]
+    comment[0]['has_children'] = 0
 
     self._db_session.commit()
     return dict(message='You have successfully added a comment.', comment=comment)
