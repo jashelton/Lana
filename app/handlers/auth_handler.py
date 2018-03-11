@@ -52,7 +52,7 @@ class AuthHandler(BaseHandler):
       response = {'message': 'Successfully logged out user'}
     elif item == "register":
       form_data = data['data']
-      user_info = dict(name=form_data['name'], username=form_data['username'], password=form_data['password'])
+      user_info = dict(username=form_data['username'], password=form_data['password'])
       res = AuthService().register(user_info)
       response = { 'data': res }
     else:
