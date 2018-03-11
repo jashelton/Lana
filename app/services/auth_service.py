@@ -14,10 +14,10 @@ class AuthService(BaseService):
     password = bcrypt.hashpw(user_info['password'].encode(encoding='UTF-8', errors='strict'), bcrypt.gensalt())
 
     sql = text(' \
-      insert into users(name, username, password, created_at) values(:name, :username, :password, curdate()) \
+      insert into users(username, password, created_at) values(:username, :password, curdate()) \
     ')
 
-    self._db_session.execute(sql, dict(name=user_info['name'], username=user_info['username'], password=password))
+    self._db_session.execute(sql, dict(username=user_info['username'], password=password))
     self._db_session.commit()
 
     return 'Successfully registered'
