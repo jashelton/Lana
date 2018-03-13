@@ -13,6 +13,26 @@ class QuestionService(BaseService):
     # +----------------------------------------------------------+
     # | id | created_at | question_id | question_type | question |
     # +----------------------------------------------------------+
+    # sql = text(' \
+    #   select \
+    #     P.id, \
+    #     P.creator_id, \
+    #     U.username as created_by, \
+    #     P.created_at, \
+    #     Q.id as question_id, \
+    #     Q.type as question_type, \
+    #     Q.question, \
+    #     count(PE.id) as responses, \
+    #     (select count(Q1.id) from questions Q1 where Q1.poll_id = P.id) as question_count, \
+    #     exists (select 1 from favorites F where F.poll_id = P.id and F.user_id = :user_id ) as favorite \
+    #   from polls P \
+    #   join questions Q on Q.poll_id = P.id \
+    #   join users U on U.id = P.creator_id \
+    #   left join poll_events PE on PE.poll_id = P.id and PE.action = "completed" \
+    #   where Q.type = "primary" \
+    #   group by P.id, P.creator_id, U.username, P.created_at, Q.id, Q.type, Q.question; \
+    # ')
+
     sql = text(' \
       select \
         P.id, \
@@ -24,7 +44,9 @@ class QuestionService(BaseService):
         Q.question, \
         count(PE.id) as responses, \
         (select count(Q1.id) from questions Q1 where Q1.poll_id = P.id) as question_count, \
-        exists (select 1 from favorites F where F.poll_id = P.id and F.user_id = :user_id ) as favorite \
+        exists (select 1 from favorites F where F.poll_id = P.id and F.user_id = :user_id ) as favorite, \
+        (select cast(sum(PR.value) as signed) from poll_ranking PR) as total_rank, \
+        (select PR.value from poll_ranking PR where PR.user_id = :user_id) as user_rank \
       from polls P \
       join questions Q on Q.poll_id = P.id \
       join users U on U.id = P.creator_id \
@@ -34,6 +56,7 @@ class QuestionService(BaseService):
     ')
 
     all_questions = self._db_session.execute(sql, dict(user_id=user)).fetchall()
+    print([dict(zip(row.keys(), row)) for row in all_questions])
     return [dict(zip(row.keys(), row)) for row in all_questions]
 
   def one(self, id, user_id):
