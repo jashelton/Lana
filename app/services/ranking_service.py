@@ -32,9 +32,37 @@ class RankingService(BaseService):
     self._db_session.commit()
     return dict(message='You have successfully ranked a poll.', data=dict(total_rank=new_total_ranking))
 
+  # TODO: Could refactor to use generic update/add methods and pass in the required table
+  def update_thread_rank(self, data):
+    update_rank = self._db_session.execute(' \
+      update thread_ranking \
+      set value = :value, updated_at = curdate() \
+      where thread_id = :thread_id and user_id = :user_id; \
+    ', dict(value=data['value'], thread_id=data['thread_id'], user_id=data['user_id']))
+
+    new_total_ranking = self.fetch_total_thread_rankings(data['thread_id'])
+
+    self._db_session.commit()
+    return dict(message='You have successfully updated your ranking.', data=dict(total_rank=new_total_ranking))
+
+  def add_thread_rank(self, data):
+    new_rank = self._db_session.execute(' \
+      insert into thread_ranking (user_id, value, updated_at, thread_id) values (:user_id, :value, curdate(), :thread_id); \
+    ', dict(user_id=data['user_id'], value=data['value'], thread_id=data['thread_id']))
+
+    new_total_ranking = self.fetch_total_thread_rankings(data['thread_id'])
+
+    self._db_session.commit()
+    return dict(message='You have successfully ranked a thread.', data=dict(total_rank=new_total_ranking))
+
   def fetch_total_rankings(self, poll_id):
     total_ranking = self._db_session.execute(' \
       select cast(sum(value) as signed) as total_rank from poll_ranking where poll_id = :poll_id; \
     ', dict(poll_id=poll_id)).fetchone()
-    print(total_ranking['total_rank'])
+    return total_ranking['total_rank']
+
+  def fetch_total_thread_rankings(self, thread_id):
+    total_ranking = self._db_session.execute(' \
+      select cast(sum(value) as signed) as total_rank from thread_ranking where thread_id = :thread_id; \
+    ', dict(thread_id=thread_id)).fetchone()
     return total_ranking['total_rank']

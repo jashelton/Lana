@@ -15,11 +15,15 @@ class CommentsService(BaseService):
     # | id | title | description | created_at | username | num_comments |
     # +-----------------------------------------------------------------+
     sql_threads = self._db_session.execute(' \
-      select T.id, T.title, T.description, T.created_at, U.username, count(C.id) as num_comments from threads T \
+      select T.id, T.title, T.description, T.created_at, U.username, count(C.id) as num_comments, \
+      (select cast(sum(TR.value) as signed) from thread_ranking TR where TR.thread_id = T.id) as total_rank, \
+      (select TR.value from thread_ranking TR where TR.user_id = 1 and TR.thread_id = T.id) as user_rank \
+      from threads T \
       left join comments C on C.thread_id = T.id \
       join users U on U.id = T.user_id \
       where T.poll_id = :poll_id \
-      group by T.id, T.title, T.description, T.created_at, U.username; \
+      group by T.id, T.title, T.description, T.created_at, U.username \
+      order by total_rank desc; \
     ', dict(poll_id=poll_id)).fetchall()
 
     return [dict(zip(row.keys(), row)) for row in sql_threads]
