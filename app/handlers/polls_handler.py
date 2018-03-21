@@ -6,10 +6,10 @@ from app.helpers.auth_helper import jwtauth
 @jwtauth
 class PollsHandler(BaseHandler):
   ITEMS = ('polls')
-  def get(self, item=None, user=None, **kwargs):
+  def get(self, item=None, user=None, current_user=None, **kwargs):
     if user:
       # polls/:user
-      res = PollService().get_poll_by_user(user)
+      res = PollService().get_poll_by_user(user, current_user)
       response = {'data': res}
       self.finish(response)
     else:

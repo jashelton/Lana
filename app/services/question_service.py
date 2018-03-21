@@ -57,7 +57,6 @@ class QuestionService(BaseService):
     ')
 
     all_questions = self._db_session.execute(sql, dict(user_id=user)).fetchall()
-    print([dict(zip(row.keys(), row)) for row in all_questions])
     return [dict(zip(row.keys(), row)) for row in all_questions]
 
   def one(self, id, user_id):

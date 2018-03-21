@@ -7,6 +7,7 @@ from app.handlers.favorites_handler import FavoritesHandler
 from app.handlers.bookmark_handler import BookmarkHandler
 from app.handlers.comments_handler import CommentsHandler
 from app.handlers.ranking_handler import RankingHandler
+from app.handlers.follows_handler import FollowsHandler
 from app.handlers.app_handler import AppHandler
 
 URL_HANDLERS = {
@@ -21,7 +22,7 @@ URL_HANDLERS = {
 
     PollsHandler: (
       r"/polls",
-      r"/polls/(?P<user>\w+)",),
+      r"/polls/(?P<user>\w+)/(?P<current_user>\d+)",),
 
     ResponseHandler: (
       r"/(?P<item>{})".format(
@@ -44,6 +45,9 @@ URL_HANDLERS = {
 
     RankingHandler: (
       r"/ranking/(?P<the_id>\w+)/(?P<item>{})".format('|'.join(RankingHandler.ITEMS)),),
+
+    FollowsHandler: (
+      r"/follows/(?P<user_id>\d+)",),
 
     AppHandler: (
       r"/",)
