@@ -6,4 +6,21 @@ from app.models.errors import HTTPError
 @jwtauth
 class FollowsHandler(BaseHandler):
   def get(self, user_id=None, **kwargs):
-    print(user_id)
+    pass
+
+  def post(self, user_id):
+    self.load_json()
+    data = self.request.arguments
+    
+    res = FollowsService().follow_user(user_id, data)
+    response = { 'data': res }
+    self.finish(response)
+
+  def delete(self, user_id):
+    self.load_json()
+    data = self.request.arguments
+
+    res = FollowsService().unfollow_user(user_id, data)
+    response = { 'data': res }
+    self.finish(response)
+    

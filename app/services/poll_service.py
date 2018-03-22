@@ -30,18 +30,16 @@ class PollService(BaseService):
 
     polls_activity = self._db_session.execute(sql_polls_by_action, dict(user_id=username['id'])).fetchall()
 
+    # TODO: This is out of place and should prob be handled in the follows service
     social = self._db_session.execute(' \
-      select count(F1.id) as following, \
-      (select count(F2.id) from follows F2 where follower_id = :user_id) as followers, \
+      select count(F1.id) as followers, \
+      (select count(F2.id) from follows F2 where follower_id = :user_id) as following, \
       exists (select 1 from follows F3 where F3.follower_id = :current_user ) as is_following \
       from follows F1 where user_id = :user_id; \
     ', dict(user_id=username['id'], current_user=current_user)).fetchone()
 
-    # social = self._db_session.execute(' \
-    #   select * from follows where user_id = :user_id or follower_id = :user_id;', \
-    #   dict(user_id=username['id'])).fetchall()
-
     data = dict(
+      user_id = username['id'],
       activity = [dict(zip(row.keys(), row)) for row in polls_activity],
       social=dict(
         following=social['following'],
@@ -49,6 +47,5 @@ class PollService(BaseService):
         is_following=social['is_following']
       )
     )
-    print(data)
 
     return data
